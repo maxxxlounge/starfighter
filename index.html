@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test WS connect</title>
+    <script type="application/javascript">
+        var wsUri = "ws:/localhost:8888/connect";
+        var output;
+
+        var timerID = 0;
+        function keepAlive() {
+            var timeout = 5000;
+            if (websocket.readyState == websocket.OPEN) {
+                websocket.send('');
+            }
+            timerId = setTimeout(keepAlive, timeout);
+        }
+        function cancelKeepAlive() {
+            if (timerId) {
+                clearTimeout(timerId);
+            }
+        }
+
+        function init() {
+            testWebSocket();
+        }
+
+        function testWebSocket() {
+            try {
+                websocket = new WebSocket(wsUri);
+                websocket.onopen = function(evt) { onOpen(evt) };
+                websocket.onclose = function(evt) { onClose(evt) };
+                websocket.onmessage = function(evt) { onMessage(evt) };
+                websocket.onerror = function(evt) { onError(evt) };
+            }catch (e) {
+                console.error("websocket connection to " + wsUri + " failed");
+            }
+        }
+
+        function onOpen(evt) {
+            console.log("CONNECTED" + evt);
+            keepAlive();
+        }
+
+        function onClose(evt)
+        {
+            console.log("DISCONNECTED" + evt);
+            cancelKeepAlive();
+        }
+
+        function onMessage(evt)
+        {
+            console.log(evt.data);
+        }
+
+        function onError(evt)
+        {
+            console.log(evt.data);
+        }
+
+        function doSend(message)
+        {
+            console.log("SENT: " + message);
+            websocket.send(message);
+        }
+
+        function isComplete(msg){
+            return msg.status == "Completed";
+        }
+
+        function hasPercent(msg){
+            return (msg.percent_completed != undefined && msg.percent_completed !== "")
+        }
+
+        window.addEventListener('load',init,false);
+
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>
