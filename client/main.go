@@ -22,7 +22,8 @@ type CustomConn struct {
 }
 
 var conn *CustomConn
-var game *game.Game
+var game game.Game
+var pic pixel.Picture
 
 func loadPicture(path string) (pixel.Picture, error) {
 	file, err := os.Open(path)
@@ -88,9 +89,7 @@ func run() {
 		if win.Pressed(pixelgl.KeySpace) {
 			SendInput(conn, pixelgl.KeySpace.String())
 		}
-
-		UpdateGame(*game.Game)
-
+		UpdateGame(game)
 		win.Update()
 	}
 }
@@ -119,4 +118,13 @@ func SendInput(c *CustomConn, input string) {
 		log.Println("write:", err)
 		return
 	}
+}
+
+func UpdateGame(g *game.Game) {
+	for _, p := range g.Players {
+		sprite := pixel.NewSprite(pic, pic.Bounds())
+		spriteX := 0.0
+		spriteY := 0.0
+	}
+
 }
