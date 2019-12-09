@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/maxxxlounge/websocket/game"
 
 	guuid "github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -16,6 +20,7 @@ type CustomConn struct {
 	ID   guuid.UUID
 }
 
+var mainGame game.Game
 var connections map[guuid.UUID]*CustomConn
 
 func main() {
@@ -35,6 +40,10 @@ func main() {
 	r.HandleFunc("/connect", func(w http.ResponseWriter, r *http.Request) {
 		Connect(w, r, l)
 	})
+
+	mainGame = game.Game{
+		Players: make(map[guuid.UUID]game.Player),
+	}
 
 	go func() {
 		Execute()
@@ -65,10 +74,16 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		Conn: c,
 	}
 	connections[g] = &cc
-	defer func(conn *websocket.Conn, g guuid.UUID) {
+	defer func(conn *websocket.Conn, g guuid.UUID, game *game.Game) {
 		delete(connections, g)
+		delete(game.Players, g)
 		c.Close()
-	}(c, g)
+	}(c, g, &mainGame)
+
+	mainGame.Players[g] = game.Player{
+		X: rand.Float64() * 1000,
+		Y: rand.Float64() * 1000,
+	}
 
 	for {
 		mType, m, err := cc.Conn.ReadMessage()
@@ -79,14 +94,29 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		if mType == websocket.TextMessage {
 			l.Infof(" connection %s send message %s", mType, string(m))
 		}
+		switch string(m) {
+		case "left":
+			break
+		case "right":
+			break
+		case "up":
+			break
+		case "down":
+			break
+		}
 	}
 }
 
 func Execute() {
+	fmt.Print("executing")
 	for {
-		for u, c := range connections {
-			msg := "send message to conn " + u.String()
-			err := c.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
+		for _, c := range connections {
+			//msg := "send message to conn " + u.String()
+			msg, err := json.Marshal(mainGame)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+			err = c.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
 			if err != nil {
 				fmt.Println(err.Error())
 			}

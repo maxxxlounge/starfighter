@@ -1,11 +1,14 @@
 package game
 
+import (
+	guuid "github.com/google/uuid"
+)
+
 type Player struct {
-	ID string
-	X  float64
-	Y  float64
+	X float64
+	Y float64
 }
 
 type Game struct {
-	Players []Player
+	Players map[guuid.UUID]Player
 }

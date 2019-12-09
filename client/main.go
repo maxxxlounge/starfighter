@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"image"
 	_ "image/png"
@@ -8,22 +9,29 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/pkg/errors"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	guuid "github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"github.com/maxxxlounge/websocket/game"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/image/colornames"
 )
 
 type CustomConn struct {
-	*websocket.Conn
-	ID guuid.UUID
+	Conn *websocket.Conn
+	ID   guuid.UUID
 }
 
 var conn *CustomConn
-var game game.Game
-var pic pixel.Picture
+var P Player
+
+type Player struct {
+	*game.Player
+	Sprite *pixel.Sprite
+}
 
 func loadPicture(path string) (pixel.Picture, error) {
 	file, err := os.Open(path)
@@ -39,6 +47,7 @@ func loadPicture(path string) (pixel.Picture, error) {
 }
 
 func run() {
+	var g game.Game
 	Formatter := new(log.TextFormatter)
 	Formatter.TimestampFormat = "02-01-2006 15:04:05"
 	Formatter.FullTimestamp = true
@@ -63,6 +72,8 @@ func run() {
 	spriteX := 0.0
 	spriteY := 0.0
 
+	P.Sprite = sprite
+
 	//last := time.Now()
 	for !win.Closed() {
 		_, message, err := conn.Conn.ReadMessage()
@@ -71,7 +82,13 @@ func run() {
 			return
 		}
 		log.Printf("recv: %s", message)
-
+		err = json.Unmarshal(message, &g)
+		if err != nil {
+			err = errors.Wrap(err, "error unmarshalling game object")
+			log.Error(err)
+			win.SetClosed(true)
+			return
+		}
 		win.Clear(colornames.Darkblue)
 		sprite.Draw(win, pixel.IM.Moved(pixel.V(spriteX, spriteY)))
 		if win.Pressed(pixelgl.KeyLeft) {
@@ -89,12 +106,13 @@ func run() {
 		if win.Pressed(pixelgl.KeySpace) {
 			SendInput(conn, pixelgl.KeySpace.String())
 		}
-		UpdateGame(game)
+		UpdateGame(win, &g)
 		win.Update()
 	}
 }
 
 func main() {
+	var err error
 	flag.Parse()
 
 	interrupt := make(chan os.Signal, 1)
@@ -103,11 +121,13 @@ func main() {
 	u := url.URL{Scheme: "ws", Host: "localhost:8888", Path: "/connect"}
 	log.Printf("connecting to %s", u.String())
 
-	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	conn = &CustomConn{}
+	conn.Conn, _, err = websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
-	defer conn.Close()
+	defer conn.Conn.Close()
+
 	pixelgl.Run(run)
 }
 
@@ -120,11 +140,8 @@ func SendInput(c *CustomConn, input string) {
 	}
 }
 
-func UpdateGame(g *game.Game) {
+func UpdateGame(win *pixelgl.Window, g *game.Game) {
 	for _, p := range g.Players {
-		sprite := pixel.NewSprite(pic, pic.Bounds())
-		spriteX := 0.0
-		spriteY := 0.0
+		P.Sprite.Draw(win, pixel.IM.Moved(pixel.V(p.X, p.Y)))
 	}
-
 }
