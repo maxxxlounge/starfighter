@@ -2,24 +2,29 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
-	"github.com/pixartprinting/log-standard/go/log"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
+
 	guuid "github.com/google/uuid"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
+	log "github.com/sirupsen/logrus"
 )
 
-var connections map[guuid.UUID]*websocket.Conn
+type CustomConn struct {
+	Conn *websocket.Conn
+	ID   guuid.UUID
+}
 
-func main(){
-	l := logrus.Logger{}
-	connections = make(map[guuid.UUID]*websocket.Conn)
+var connections map[guuid.UUID]*CustomConn
+
+func main() {
+	l := &log.Logger{}
+	connections = make(map[guuid.UUID]*CustomConn)
 	//server
 	r := mux.NewRouter()
 	srv := &http.Server{
-		Addr: ":8888" ,
+		Addr: ":8888",
 		// Good practice to set timeouts to avoid Slowloris attacks.
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
@@ -27,8 +32,8 @@ func main(){
 		Handler:      r, // Pass our instance of gorilla/mux in.
 	}
 
-	r.HandleFunc("/connect",func(w http.ResponseWriter, r *http.Request){
-		Connect(w,r, l)
+	r.HandleFunc("/connect", func(w http.ResponseWriter, r *http.Request) {
+		Connect(w, r, l)
 	})
 
 	go func() {
@@ -38,7 +43,6 @@ func main(){
 	l.Infof("start listening on %s", srv.Addr)
 	l.Fatal(srv.ListenAndServe())
 }
-
 
 func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 	var upgrader = websocket.Upgrader{
@@ -56,14 +60,18 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		return
 	}
 	g := guuid.New()
-	connections[g] = c
-	defer func(conn *websocket.Conn,g guuid.UUID){
-		delete(connections,g)
+	cc := CustomConn{
+		ID:   g,
+		Conn: c,
+	}
+	connections[g] = &cc
+	defer func(conn *websocket.Conn, g guuid.UUID) {
+		delete(connections, g)
 		c.Close()
-	}(c,g)
+	}(c, g)
 
 	for {
-		mType,m,err := c.ReadMessage()
+		mType, m, err := cc.Conn.ReadMessage()
 		if err != nil {
 			l.Error(err)
 			return
@@ -74,19 +82,20 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 	}
 }
 
-func Execute(){
+func Execute() {
 	for {
 		for u, c := range connections {
-			msg := "send message to conn "+u.String()
-			err := c.WriteMessage(websocket.TextMessage, []byte(msg))
+			msg := "send message to conn " + u.String()
+			err := c.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 			fmt.Println(msg)
 		}
-		time.Sleep(1*time.Second)
+		time.Sleep(1 * time.Second)
 	}
 }
 
+func (c *CustomConn) ReceiveMessage() {
 
-
+}

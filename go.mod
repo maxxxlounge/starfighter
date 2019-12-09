@@ -15,4 +15,5 @@ require (
 	github.com/pixartprinting/log-standard/go/log v0.0.0-20190927095108-acc6d08ca566
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/sirupsen/logrus v1.0.5
+	golang.org/x/image v0.0.0-20191206065243-da761ea9ff43 // indirect
 )
