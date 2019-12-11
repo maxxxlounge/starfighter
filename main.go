@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -42,7 +41,7 @@ func main() {
 	})
 
 	mainGame = game.Game{
-		Players: make(map[guuid.UUID]game.Player),
+		Players: make(map[guuid.UUID]*game.Player),
 	}
 
 	go func() {
@@ -79,30 +78,52 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		delete(game.Players, g)
 		c.Close()
 	}(c, g, &mainGame)
+	p := mainGame.NewPlayer(g)
 
-	mainGame.Players[g] = game.Player{
-		X: rand.Float64() * 1000,
-		Y: rand.Float64() * 1000,
-	}
-
+	last := time.Now()
 	for {
+		dt := time.Since(last).Seconds()
+		last = time.Now()
+
+		mainGame.MovePlayers(dt)
+		mainGame.MoveBullets(dt)
+
 		mType, m, err := cc.Conn.ReadMessage()
 		if err != nil {
 			l.Error(err)
 			return
 		}
 		if mType == websocket.TextMessage {
-			l.Infof(" connection %s send message %s", mType, string(m))
+			//fmt.Println(fmt.Sprintf(" connection %s send message %s", g, string(m)))
 		}
+
 		switch string(m) {
-		case "left":
+		case "Leftup":
+			p.Left = false
 			break
-		case "right":
+		case "Leftdown":
+			p.Left = true
 			break
-		case "up":
+		case "Rightup":
+			p.Right = false
 			break
-		case "down":
+		case "Rightdown":
+			p.Right = true
 			break
+		case "Downup":
+			p.Down = false
+			break
+		case "Downdown":
+			p.Down = true
+			break
+		case "Upup":
+			p.Up = false
+			break
+		case "Updown":
+			p.Up = true
+			break
+		case "shoot":
+			mainGame.AddBullet(p.X, p.Y, g)
 		}
 	}
 }
@@ -111,6 +132,7 @@ func Execute() {
 	fmt.Print("executing")
 	for {
 		for _, c := range connections {
+			mainGame.You = mainGame.Players[c.ID]
 			//msg := "send message to conn " + u.String()
 			msg, err := json.Marshal(mainGame)
 			if err != nil {
@@ -120,12 +142,8 @@ func Execute() {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			fmt.Println(msg)
+			//fmt.Printf("%v", string(msg))
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(50 * time.Millisecond)
 	}
-}
-
-func (c *CustomConn) ReceiveMessage() {
-
 }

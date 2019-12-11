@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -31,6 +32,7 @@ var P Player
 type Player struct {
 	*game.Player
 	Sprite *pixel.Sprite
+	ID     guuid.UUID
 }
 
 func loadPicture(path string) (pixel.Picture, error) {
@@ -44,6 +46,24 @@ func loadPicture(path string) (pixel.Picture, error) {
 		return nil, err
 	}
 	return pixel.PictureDataFromImage(img), nil
+}
+
+func ReceiveMessage(g *game.Game) {
+	for {
+		_, message, err := conn.Conn.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			return
+		}
+		//log.Printf("recv: %s", message)
+		err = json.Unmarshal(message, &g)
+		if err != nil {
+			err = errors.Wrap(err, "error unmarshalling game object")
+			log.Error(err)
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 }
 
 func run() {
@@ -67,41 +87,47 @@ func run() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	bg, err := loadPicture("./bg.png")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	sprite := pixel.NewSprite(pic, pic.Bounds())
-	spriteX := 0.0
-	spriteY := 0.0
+	bgsprite := pixel.NewSprite(bg, bg.Bounds())
+	P = Player{
+		Sprite: sprite,
+	}
 
-	P.Sprite = sprite
+	go ReceiveMessage(&g)
 
-	//last := time.Now()
 	for !win.Closed() {
-		_, message, err := conn.Conn.ReadMessage()
-		if err != nil {
-			log.Println("read:", err)
-			return
-		}
-		log.Printf("recv: %s", message)
-		err = json.Unmarshal(message, &g)
-		if err != nil {
-			err = errors.Wrap(err, "error unmarshalling game object")
-			log.Error(err)
-			win.SetClosed(true)
-			return
-		}
-		win.Clear(colornames.Darkblue)
-		sprite.Draw(win, pixel.IM.Moved(pixel.V(spriteX, spriteY)))
+
+		win.Clear(colornames.Black)
+		bgsprite.Draw(win, pixel.IM.Moved(win.Bounds().Center()))
+
 		if win.Pressed(pixelgl.KeyLeft) {
-			SendInput(conn, pixelgl.KeyLeft.String())
+			SendInput(conn, pixelgl.KeyLeft.String()+"down")
+		}
+		if win.JustReleased(pixelgl.KeyLeft) {
+			SendInput(conn, pixelgl.KeyLeft.String()+"up")
 		}
 		if win.Pressed(pixelgl.KeyRight) {
-			SendInput(conn, pixelgl.KeyRight.String())
+			SendInput(conn, pixelgl.KeyRight.String()+"down")
+		}
+		if win.JustReleased(pixelgl.KeyRight) {
+			SendInput(conn, pixelgl.KeyRight.String()+"up")
 		}
 		if win.Pressed(pixelgl.KeyDown) {
-			SendInput(conn, pixelgl.KeyDown.String())
+			SendInput(conn, pixelgl.KeyDown.String()+"down")
+		}
+		if win.JustReleased(pixelgl.KeyDown) {
+			SendInput(conn, pixelgl.KeyDown.String()+"up")
 		}
 		if win.Pressed(pixelgl.KeyUp) {
-			SendInput(conn, pixelgl.KeyUp.String())
+			SendInput(conn, pixelgl.KeyUp.String()+"down")
+		}
+		if win.JustReleased(pixelgl.KeyUp) {
+			SendInput(conn, pixelgl.KeyUp.String()+"up")
 		}
 		if win.Pressed(pixelgl.KeySpace) {
 			SendInput(conn, pixelgl.KeySpace.String())
@@ -141,7 +167,16 @@ func SendInput(c *CustomConn, input string) {
 }
 
 func UpdateGame(win *pixelgl.Window, g *game.Game) {
+	camPos := pixel.ZV
+	if g.You != nil {
+		camPos = pixel.V(g.You.X, g.You.Y)
+	}
+	cam := pixel.IM.Scaled(camPos, 4).Moved(win.Bounds().Center().Sub(camPos))
+	win.SetMatrix(cam)
+
 	for _, p := range g.Players {
-		P.Sprite.Draw(win, pixel.IM.Moved(pixel.V(p.X, p.Y)))
+		mat := pixel.IM.Moved(pixel.V(p.X, p.Y))
+		mat = mat.Rotated(pixel.V(p.X, p.Y), p.Rotation)
+		P.Sprite.Draw(win, mat)
 	}
 }
