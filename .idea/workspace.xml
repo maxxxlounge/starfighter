@@ -2,10 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="058f28b9-8175-4203-889d-e4613bab98ae" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/client/player/tutorial/01/01_using_pixel.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/player/tutorial/02/02_read_input.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/player/tutorial/03/03_websocket_client.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/player/tutorial/04/04_server.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/player/tutorial/pig.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/client/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/bg.png" beforeDir="false" afterPath="$PROJECT_DIR$/client/player/bg.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/client/player/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/pig.png" beforeDir="false" afterPath="$PROJECT_DIR$/client/player/pig.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ws.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/game/game.go" beforeDir="false" afterPath="$PROJECT_DIR$/game/game.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/main.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,29 +23,35 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/client/main.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1530">
-              <caret line="104" column="34" selection-start-line="104" selection-start-column="34" selection-end-line="104" selection-end-column="34" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1350">
-              <caret line="87" column="22" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/client/player/main.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1961">
+              <caret line="109" column="13" lean-forward="true" selection-start-line="109" selection-start-column="13" selection-end-line="109" selection-end-column="13" />
+              <folding>
+                <element signature="e#14#366#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/main.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1152">
+              <caret line="150" selection-start-line="124" selection-end-line="150" />
+              <folding>
+                <element signature="e#14#235#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/game/game.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1047">
-              <caret line="109" column="25" selection-start-line="109" selection-start-column="25" selection-end-line="109" selection-end-column="25" />
+            <state relative-caret-position="24">
+              <caret line="101" column="20" selection-start-line="101" selection-start-column="20" selection-end-line="101" selection-end-column="20" />
             </state>
           </provider>
         </entry>
@@ -56,6 +70,9 @@
     <findStrings>
       <find>l.</find>
       <find>mainGame.Players[g].Acceleration</find>
+      <find>make</find>
+      <find>Players</find>
+      <find>func</find>
     </findStrings>
     <replaceStrings>
       <replace>log</replace>
@@ -74,9 +91,21 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/client/ws.go" />
         <option value="$PROJECT_DIR$/game/gamse.go" />
+        <option value="$PROJECT_DIR$/client/main.go" />
+        <option value="$PROJECT_DIR$/client/spectator/main.go" />
         <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/game/game.go" />
-        <option value="$PROJECT_DIR$/client/main.go" />
+        <option value="$PROJECT_DIR$/server/main.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/03_web_socket.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/04_listen_from_server.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/05_send_input_message.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/01_using_pixel.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/02_read_input.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/02/02_read_input.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/01/01_using_pixel.go" />
+        <option value="$PROJECT_DIR$/client/player/main.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/03/03_web_socket.go" />
+        <option value="$PROJECT_DIR$/client/player/tutorial/04/04_listen_from_server.go" />
       </list>
     </option>
   </component>
@@ -91,7 +120,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -107,12 +135,19 @@
             <path>
               <item name="websocket" type="b2602c69:ProjectViewProjectNode" />
               <item name="websocket" type="462c0819:PsiDirectoryNode" />
-              <item name="game" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
+              <item name="player" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="websocket" type="b2602c69:ProjectViewProjectNode" />
+              <item name="websocket" type="462c0819:PsiDirectoryNode" />
+              <item name="server" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -124,10 +159,23 @@
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/client/player/tutorial" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/client/player/tutorial/04" />
+      <recent name="$PROJECT_DIR$/client/player/tutorial/03" />
+      <recent name="$PROJECT_DIR$/client/player/tutorial/02" />
+      <recent name="$PROJECT_DIR$/client/player/tutorial/01" />
+      <recent name="$PROJECT_DIR$/server" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/client/player/tutorial" />
+      <recent name="$PROJECT_DIR$/client/spectator" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -142,15 +190,14 @@
     </option>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1200" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.30191693" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17216118" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32857144" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3283186" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -191,13 +238,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../faiface/pixel/pixelgl/window.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="488">
-          <caret line="174" column="17" selection-start-line="174" selection-start-column="17" selection-end-line="174" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../faiface/pixel/pixelgl/run.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="378">
@@ -226,19 +266,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/ws.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1026">
-          <caret line="57" column="13" selection-start-line="53" selection-start-column="8" selection-end-line="57" selection-end-column="13" />
-          <folding>
-            <element signature="e#14#110#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client/pig.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/client/ws.go" />
     <entry file="file://$PROJECT_DIR$/../../faiface/pixel/pixelgl/input.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="88">
@@ -253,24 +281,85 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/main.go">
+    <entry file="file://$PROJECT_DIR$/client/spectator/main.go" />
+    <entry file="file://$PROJECT_DIR$/../../faiface/pixel/pixelgl/window.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1530">
-          <caret line="104" column="34" selection-start-line="104" selection-start-column="34" selection-end-line="104" selection-end-column="34" />
+        <state relative-caret-position="444">
+          <caret line="174" column="17" selection-start-line="174" selection-start-column="17" selection-end-line="174" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
+    <entry file="file://$PROJECT_DIR$/client/player/pig.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/player/tutorial/01/01_using_pixel.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1350">
-          <caret line="87" column="22" selection-start-line="87" selection-start-column="22" selection-end-line="87" selection-end-column="22" />
+        <state relative-caret-position="36">
+          <caret line="2" column="8" selection-start-line="2" selection-start-column="8" selection-end-line="2" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/player/tutorial/02/02_read_input.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1080">
+          <caret line="60" selection-start-line="60" selection-end-line="60" />
+          <folding>
+            <element signature="e#14#144#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/player/tutorial/03/03_websocket_client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="32" column="1" selection-start-line="32" selection-start-column="1" selection-end-line="32" selection-end-column="1" />
+          <folding>
+            <element signature="e#14#167#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/game/game.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1047">
-          <caret line="109" column="25" selection-start-line="109" selection-start-column="25" selection-end-line="109" selection-end-column="25" />
+        <state relative-caret-position="24">
+          <caret line="101" column="20" selection-start-line="101" selection-start-column="20" selection-end-line="101" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1152">
+          <caret line="150" selection-start-line="124" selection-end-line="150" />
+          <folding>
+            <element signature="e#14#235#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/player/tutorial/05_send_input_message.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="16" selection-start-column="16" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/player/tutorial/04/04_server.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1242">
+          <caret line="69" column="1" selection-start-line="69" selection-start-column="1" selection-end-line="69" selection-end-column="1" />
+          <folding>
+            <element signature="e#12#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/player/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1961">
+          <caret line="109" column="13" lean-forward="true" selection-start-line="109" selection-start-column="13" selection-end-line="109" selection-end-column="13" />
+          <folding>
+            <element signature="e#14#366#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
