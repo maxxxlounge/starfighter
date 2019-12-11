@@ -80,21 +80,14 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 	}(c, g, &mainGame)
 	p := mainGame.NewPlayer(g)
 
-	last := time.Now()
 	for {
-		dt := time.Since(last).Seconds()
-		last = time.Now()
-
-		mainGame.MovePlayers(dt)
-		mainGame.MoveBullets(dt)
-
 		mType, m, err := cc.Conn.ReadMessage()
 		if err != nil {
 			l.Error(err)
 			return
 		}
-		if mType == websocket.TextMessage {
-			//fmt.Println(fmt.Sprintf(" connection %s send message %s", g, string(m)))
+		if mType != websocket.TextMessage {
+			continue
 		}
 
 		switch string(m) {
@@ -123,27 +116,35 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 			p.Up = true
 			break
 		case "shoot":
-			mainGame.AddBullet(p.X, p.Y, g)
+			mainGame.AddBullet(p.X, p.Y, g, p.Rotation, p.Power)
 		}
+
 	}
 }
 
 func Execute() {
 	fmt.Print("executing")
+	last := time.Now()
 	for {
+		dt := time.Since(last).Seconds()
+		last = time.Now()
+		mainGame.MovePlayers(dt)
+		mainGame.MoveBullets(dt)
+		//smainGame.Collision()
+
 		for _, c := range connections {
 			mainGame.You = mainGame.Players[c.ID]
-			//msg := "send message to conn " + u.String()
 			msg, err := json.Marshal(mainGame)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
+			//msg := "send message to conn " + u.String()
 			err = c.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 			//fmt.Printf("%v", string(msg))
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 	}
 }
