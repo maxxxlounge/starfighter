@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	_ "image/png"
 	"log"
 	"os"
 
@@ -38,7 +39,7 @@ func run() {
 		log.Fatal(err)
 	}
 
-	pic, err := loadPicture("./pig.png")
+	pic, err := loadPicture("pig.png")
 	if err != nil {
 		log.Fatal(err)
 	}

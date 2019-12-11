@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
+	"os/signal"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -12,6 +15,9 @@ import (
 func main() {
 	var err error
 	flag.Parse()
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
 
 	u := url.URL{Scheme: "ws", Host: "localhost:8888", Path: "/connect"}
 	log.Printf("connecting to %s", u.String())
@@ -21,6 +27,11 @@ func main() {
 		log.Fatal("dial:", err)
 	}
 	defer conn.Close()
+	for {
+		SendMessage(conn, "ping")
+		ReceiveMessage(conn)
+		time.Sleep(3 * time.Second)
+	}
 }
 
 func SendMessage(c *websocket.Conn, msg string) {
@@ -39,6 +50,6 @@ func ReceiveMessage(conn *websocket.Conn) {
 		return
 	}
 	if mt == websocket.TextMessage {
-		fmt.Printf("recv: %s", message)
+		fmt.Printf("recv: %s", string(message))
 	}
 }

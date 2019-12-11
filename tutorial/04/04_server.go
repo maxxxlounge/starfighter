@@ -72,13 +72,13 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 func Execute() {
 	fmt.Print("executing")
 	for {
-		for k, c := range connections {
-			msg := "send message to conn " + k.String()
+		for _, c := range connections {
+			msg := "pong"
 			err := c.WriteMessage(websocket.TextMessage, []byte(msg))
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 		}
-		time.Sleep(20 * time.Millisecond)
+		time.Sleep(5 * time.Second)
 	}
 }

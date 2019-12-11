@@ -2,6 +2,7 @@ package main
 
 import (
 	"image"
+	_ "image/png"
 	"log"
 	"os"
 

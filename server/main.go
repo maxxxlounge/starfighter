@@ -28,8 +28,7 @@ func main() {
 	//server
 	r := mux.NewRouter()
 	srv := &http.Server{
-		Addr: ":8888",
-		// Good practice to set timeouts to avoid Slowloris attacks.
+		Addr:         ":8888",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
