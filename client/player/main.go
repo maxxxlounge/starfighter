@@ -3,18 +3,21 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"image"
 	_ "image/png"
 	"net/url"
 	"os"
 
-	"github.com/pkg/errors"
+	"github.com/faiface/pixel/text"
+	"golang.org/x/image/font/basicfont"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 	guuid "github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/maxxxlounge/websocket/game"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/image/colornames"
 )
@@ -64,6 +67,7 @@ func ReceiveMessage(g *game.Game) {
 
 func run() {
 	var g game.Game
+	basicAtlas := text.NewAtlas(basicfont.Face7x13, text.ASCII)
 	Formatter := new(log.TextFormatter)
 	Formatter.TimestampFormat = "02-01-2006 15:04:05"
 	Formatter.FullTimestamp = true
@@ -101,7 +105,7 @@ func run() {
 		bgsprite.Draw(win, pixel.IM.Moved(win.Bounds().Center()))
 		ReceiveMessage(&g)
 		if g.You != nil {
-			if g.You.Life < 0 {
+			if g.You.Life <= 0 {
 				log.Println("you died!")
 				return
 			}
@@ -134,7 +138,7 @@ func run() {
 			}
 		}
 
-		UpdateGame(win, &g)
+		UpdateGame(win, &g, basicAtlas)
 		win.Update()
 	}
 }
@@ -168,7 +172,7 @@ func SendInput(c *CustomConn, input string) {
 	}
 }
 
-func UpdateGame(win *pixelgl.Window, g *game.Game) {
+func UpdateGame(win *pixelgl.Window, g *game.Game, atlas *text.Atlas) {
 	camPos := pixel.ZV
 	if g.You != nil {
 		camPos = pixel.V(g.You.X, g.You.Y)
@@ -182,9 +186,15 @@ func UpdateGame(win *pixelgl.Window, g *game.Game) {
 
 	for _, p := range g.Players {
 		if p != g.You {
+			if p.Life <= 0 {
+				continue
+			}
 			mat := pixel.IM.Moved(pixel.V(p.X, p.Y))
 			mat = mat.Rotated(pixel.V(p.X, p.Y), float64(p.Rotation))
 			sprite.Draw(win, mat)
+			basicTxt := text.New(pixel.V(p.X-3, p.Y+10), atlas)
+			fmt.Fprintf(basicTxt, fmt.Sprintf("%v", p.Life))
+			basicTxt.Draw(win, pixel.IM)
 		}
 	}
 

@@ -88,6 +88,9 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		if mType != websocket.TextMessage {
 			continue
 		}
+		if p.ReloadTime > 0 {
+			p.ReloadTime--
+		}
 
 		switch string(m) {
 		case "Leftup":
@@ -115,7 +118,11 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 			p.Up = true
 			break
 		case "shoot":
-			mainGame.AddBullet(p.X, p.Y, g, p.Rotation, p.Power)
+			if p.ReloadTime <= 0 {
+				mainGame.AddBullet(p.X, p.Y, g, p.Rotation, p.Power)
+				p.ReloadTime = 25
+			}
+			break
 		}
 
 	}
@@ -129,7 +136,7 @@ func Execute() {
 		last = time.Now()
 		mainGame.MovePlayers(dt)
 		mainGame.MoveBullets(dt)
-		//smainGame.Collision()
+		mainGame.Collision()
 
 		for _, c := range connections {
 			mainGame.You = mainGame.Players[c.ID]

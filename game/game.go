@@ -19,6 +19,7 @@ type Player struct {
 	Rotation              RotationDegree
 	Life                  float64
 	Power                 float64
+	ReloadTime            float64
 }
 
 type Camera struct {
@@ -109,9 +110,9 @@ func (g *Game) MovePlayers(dt float64) {
 }
 
 func (g *Game) Collision() {
-	tolerance := 2.0
+	tolerance := 5.0
 	for k, p := range g.Players {
-		if p.Life < 0 {
+		if p.Life <= 0 {
 			continue
 		}
 		for _, b := range g.Bullets {
@@ -121,18 +122,17 @@ func (g *Game) Collision() {
 			if math.Abs(b.X-p.X) > tolerance {
 				continue
 			}
-			if math.Abs(b.Y-p.Y) > tolerance {
+			if math.Abs(b.Y-p.Y) > tolerance*2 {
 				continue
 			}
 			p.Life -= 1
 			b.Exhausted = true
 		}
 	}
-	for i, b := range g.Bullets {
-		if b.Exhausted {
-			g.Bullets[i] = g.Bullets[len(g.Bullets)-1] // Copy last element to index i.
-			g.Bullets[len(g.Bullets)-1] = nil          // Erase last element (write zero value).
-			g.Bullets = g.Bullets[:len(g.Bullets)-1]
+
+	for i := len(g.Bullets) - 1; i >= 0; i-- {
+		if g.Bullets[i].Exhausted {
+			g.Bullets = append(g.Bullets[:i], g.Bullets[i+1:]...)
 		}
 	}
 }
@@ -150,6 +150,7 @@ func (g *Game) NewPlayer(id guuid.UUID) *Player {
 		Rotation:     math.Pi / 2,
 		Life:         10,
 		Power:        1,
+		ReloadTime:   50.0,
 	}
 	g.Players[id] = p
 	return p
