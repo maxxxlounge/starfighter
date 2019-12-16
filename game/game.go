@@ -60,7 +60,7 @@ const RotationLeftDown RotationDegree = (math.Pi / 2) + (math.Pi / 4)
 
 func (p *Player) MovePlayer(dt float64) {
 
-	if p.Right {
+	if p.Right && p.X < 1024 {
 		p.X += p.Acceleration * p.Velocity
 		if !p.Up && !p.Down {
 			p.Rotation = RotationRight
@@ -73,7 +73,7 @@ func (p *Player) MovePlayer(dt float64) {
 		p.Rotation = RotationRightDown
 	}
 
-	if p.Left {
+	if p.Left && p.X > 0 {
 		p.X -= p.Acceleration * p.Velocity
 		if !p.Up && !p.Down {
 			p.Rotation = RotationLeft
@@ -86,13 +86,13 @@ func (p *Player) MovePlayer(dt float64) {
 		p.Rotation = RotationLeftDown
 	}
 
-	if p.Up {
+	if p.Up && p.Y < 768 {
 		p.Y += p.Acceleration * p.Velocity
 		if !p.Left && !p.Right {
 			p.Rotation = RotationUp
 		}
 	}
-	if p.Down {
+	if p.Down && p.Y > 0 {
 		p.Y -= p.Acceleration * p.Velocity
 		if !p.Left && !p.Right {
 			p.Rotation = RotationDown
@@ -131,7 +131,7 @@ func (g *Game) Collision() {
 	}
 
 	for i := len(g.Bullets) - 1; i >= 0; i-- {
-		if g.Bullets[i].Exhausted {
+		if g.Bullets[i].Exhausted || g.Bullets[i].Y > 768 || g.Bullets[i].X > 1024 || g.Bullets[i].X < 0 || g.Bullets[i].Y < 0 {
 			g.Bullets = append(g.Bullets[:i], g.Bullets[i+1:]...)
 		}
 	}
