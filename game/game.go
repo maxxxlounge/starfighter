@@ -20,7 +20,16 @@ type Player struct {
 	Life                  float64
 	Power                 float64
 	ReloadTime            float64
+	Status PlayerStatus
+	Score int
 }
+
+type PlayerStatus string
+const WaitForPlay PlayerStatus = "WaitForPlay"
+const Ready PlayerStatus = "Ready"
+const Died PlayerStatus = "Died"
+const Idle PlayerStatus = "Idle"
+const Respawn PlayerStatus = "Respawn"
 
 type Camera struct {
 	Pos       pixel.Vec
@@ -29,10 +38,16 @@ type Camera struct {
 	ZoomSpeed float64
 }
 
+type GameStatus string
+const WaitForPlayer GameStatus = "WaitForPlayer"
+const Playing GameStatus = "Playing"
+const Scoreboard GameStatus = "Scoreboard"
+
 type Game struct {
 	Players map[guuid.UUID]*Player
 	Bullets []*Bullet
 	You     *Player
+	Status GameStatus
 }
 
 type Bullet struct {
@@ -127,6 +142,7 @@ func (g *Game) Collision() {
 			}
 			p.Life -= 1
 			b.Exhausted = true
+			g.Players[b.Owner].Score ++
 		}
 	}
 
@@ -151,6 +167,8 @@ func (g *Game) NewPlayer(id guuid.UUID) *Player {
 		Life:         10,
 		Power:        1,
 		ReloadTime:   50.0,
+		Status: WaitForPlay,
+		Score: 0,
 	}
 	g.Players[id] = p
 	return p
