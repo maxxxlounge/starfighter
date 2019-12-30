@@ -72,6 +72,7 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		Conn: c,
 	}
 	connections[g] = &cc
+	fmt.Printf("incoming connection %s from %s", g.String(), cc.Conn.LocalAddr().String())
 	defer func(conn *websocket.Conn, g guuid.UUID, game *game.Game) {
 		delete(connections, g)
 		delete(game.Players, g)
