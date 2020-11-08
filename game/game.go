@@ -11,6 +11,9 @@ import (
 )
 
 type Player struct {
+	ID                    string
+	UUID                  guuid.UUID
+	Name                  string
 	X                     float64
 	Y                     float64
 	Left, Right, Up, Down bool
@@ -20,11 +23,13 @@ type Player struct {
 	Life                  float64
 	Power                 float64
 	ReloadTime            float64
-	Status PlayerStatus
-	Score int
+	Status                PlayerStatus
+	Score                 int
+	You                   bool
 }
 
 type PlayerStatus string
+
 const WaitForPlay PlayerStatus = "WaitForPlay"
 const Ready PlayerStatus = "Ready"
 const Died PlayerStatus = "Died"
@@ -39,15 +44,16 @@ type Camera struct {
 }
 
 type GameStatus string
+
 const WaitForPlayer GameStatus = "WaitForPlayer"
 const Playing GameStatus = "Playing"
 const Scoreboard GameStatus = "Scoreboard"
 
 type Game struct {
-	Players map[guuid.UUID]*Player
-	Bullets []*Bullet
-	You     *Player
-	Status GameStatus
+	playerMap map[guuid.UUID]*Player
+	Players   []*Player
+	Bullets   []*Bullet
+	Status    GameStatus
 }
 
 type Bullet struct {
@@ -72,6 +78,13 @@ const RotationRightUp RotationDegree = (3 * math.Pi / 2) + (math.Pi / 4)
 const RotationRightDown RotationDegree = (3 * math.Pi / 2) - (math.Pi / 4)
 const RotationLeftUp RotationDegree = (math.Pi / 2) - (math.Pi / 4)
 const RotationLeftDown RotationDegree = (math.Pi / 2) + (math.Pi / 4)
+
+func New() *Game {
+	g := Game{
+		playerMap: make(map[guuid.UUID]*Player),
+	}
+	return &g
+}
 
 func (p *Player) MovePlayer(dt float64) {
 
@@ -126,7 +139,7 @@ func (g *Game) MovePlayers(dt float64) {
 
 func (g *Game) Collision() {
 	tolerance := 5.0
-	for k, p := range g.Players {
+	for k, p := range g.playerMap {
 		if p.Life <= 0 {
 			continue
 		}
@@ -142,7 +155,7 @@ func (g *Game) Collision() {
 			}
 			p.Life -= 1
 			b.Exhausted = true
-			g.Players[b.Owner].Score ++
+			g.playerMap[b.Owner].Score++
 		}
 	}
 
@@ -153,8 +166,17 @@ func (g *Game) Collision() {
 	}
 }
 
+func (g *Game) SetYou(id guuid.UUID) {
+	g.playerMap[id].You = true
+}
+
+func (g *Game) DeletePlayer(id guuid.UUID) {
+	delete(g.playerMap, id)
+}
+
 func (g *Game) NewPlayer(id guuid.UUID) *Player {
 	p := &Player{
+		UUID:         id,
 		X:            rand.Float64() * 500,
 		Y:            rand.Float64() * 500,
 		Left:         false,
@@ -167,10 +189,11 @@ func (g *Game) NewPlayer(id guuid.UUID) *Player {
 		Life:         10,
 		Power:        1,
 		ReloadTime:   50.0,
-		Status: WaitForPlay,
-		Score: 0,
+		Status:       WaitForPlay,
+		Score:        0,
 	}
-	g.Players[id] = p
+	g.playerMap[id] = p
+	g.Players = append(g.Players, p)
 	return p
 }
 
@@ -220,4 +243,8 @@ func (g *Game) MoveBullets(dt float64) {
 		}
 	}
 	return
+}
+
+func ToJson() {
+
 }

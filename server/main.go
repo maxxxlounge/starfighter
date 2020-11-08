@@ -19,7 +19,7 @@ type CustomConn struct {
 	ID   guuid.UUID
 }
 
-var mainGame game.Game
+var mainGame *game.Game
 var connections map[guuid.UUID]*CustomConn
 
 func main() {
@@ -39,15 +39,13 @@ func main() {
 		Connect(w, r, l)
 	})
 
-	mainGame = game.Game{
-		Players: make(map[guuid.UUID]*game.Player),
-	}
+	mainGame = game.New()
 
 	go func() {
 		Execute()
 	}()
 
-	l.Infof("start listening on %s", srv.Addr)
+	fmt.Printf("start listening on %s\n", srv.Addr)
 	l.Fatal(srv.ListenAndServe())
 }
 
@@ -75,9 +73,9 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 	fmt.Printf("incoming connection %s from %s", g.String(), cc.Conn.LocalAddr().String())
 	defer func(conn *websocket.Conn, g guuid.UUID, game *game.Game) {
 		delete(connections, g)
-		delete(game.Players, g)
+		game.DeletePlayer(g)
 		c.Close()
-	}(c, g, &mainGame)
+	}(c, g, mainGame)
 	p := mainGame.NewPlayer(g)
 
 	for {
@@ -130,7 +128,7 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 }
 
 func Execute() {
-	fmt.Print("executing")
+	fmt.Println("executing")
 	last := time.Now()
 	for {
 		dt := time.Since(last).Seconds()
@@ -140,13 +138,13 @@ func Execute() {
 		mainGame.Collision()
 
 		for _, c := range connections {
-			mainGame.You = mainGame.Players[c.ID]
+			mainGame.SetYou(c.ID)
 			msg, err := json.Marshal(mainGame)
 			if err != nil {
 				fmt.Println(err.Error())
 			}
 			//msg := "send message to conn " + u.String()
-			err = c.Conn.WriteMessage(websocket.TextMessage, []byte(msg))
+			err = c.Conn.WriteMessage(websocket.TextMessage, msg) //[]byte(msg))
 			if err != nil {
 				fmt.Println(err.Error())
 			}
