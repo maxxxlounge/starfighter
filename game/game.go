@@ -54,6 +54,12 @@ type Game struct {
 	Players   []*Player
 	Bullets   []*Bullet
 	Status    GameStatus
+	You       *Player
+	Bounds    Bounds
+}
+type Bounds struct {
+	Width  float64
+	Height float64
 }
 
 type Bullet struct {
@@ -69,6 +75,9 @@ type Bullet struct {
 
 type RotationDegree float64
 
+const GameWidth float64 = 1024
+const GameHeight float64 = 768
+
 const RotationUp RotationDegree = math.Pi * 2
 const RotationDown RotationDegree = math.Pi
 const RotationLeft RotationDegree = math.Pi / 2
@@ -82,13 +91,17 @@ const RotationLeftDown RotationDegree = (math.Pi / 2) + (math.Pi / 4)
 func New() *Game {
 	g := Game{
 		playerMap: make(map[guuid.UUID]*Player),
+		Bounds: Bounds{
+			Width:  GameWidth,
+			Height: GameHeight,
+		},
 	}
 	return &g
 }
 
 func (p *Player) MovePlayer(dt float64) {
 
-	if p.Right && p.X < 1024 {
+	if p.Right && p.X < GameWidth {
 		p.X += p.Acceleration * p.Velocity
 		if !p.Up && !p.Down {
 			p.Rotation = RotationRight
@@ -114,7 +127,7 @@ func (p *Player) MovePlayer(dt float64) {
 		p.Rotation = RotationLeftDown
 	}
 
-	if p.Up && p.Y < 768 {
+	if p.Up && p.Y < GameHeight {
 		p.Y += p.Acceleration * p.Velocity
 		if !p.Left && !p.Right {
 			p.Rotation = RotationUp
@@ -160,25 +173,34 @@ func (g *Game) Collision() {
 	}
 
 	for i := len(g.Bullets) - 1; i >= 0; i-- {
-		if g.Bullets[i].Exhausted || g.Bullets[i].Y > 768 || g.Bullets[i].X > 1024 || g.Bullets[i].X < 0 || g.Bullets[i].Y < 0 {
+		if g.Bullets[i].Exhausted || g.Bullets[i].Y > GameHeight || g.Bullets[i].X > GameWidth || g.Bullets[i].X < 0 || g.Bullets[i].Y < 0 {
 			g.Bullets = append(g.Bullets[:i], g.Bullets[i+1:]...)
 		}
 	}
 }
 
 func (g *Game) SetYou(id guuid.UUID) {
-	g.playerMap[id].You = true
+	//g.playerMap[id].You = true
+	g.You = g.playerMap[id]
 }
 
 func (g *Game) DeletePlayer(id guuid.UUID) {
+	for i, p := range g.Players {
+		if p.UUID != id {
+			continue
+		}
+		g.Players[i] = g.Players[len(g.Players)-1]
+		g.Players[len(g.Players)-1] = nil
+		g.Players = g.Players[:len(g.Players)-1]
+	}
 	delete(g.playerMap, id)
 }
 
 func (g *Game) NewPlayer(id guuid.UUID) *Player {
 	p := &Player{
 		UUID:         id,
-		X:            rand.Float64() * 500,
-		Y:            rand.Float64() * 500,
+		X:            rand.Float64() * GameWidth,
+		Y:            rand.Float64() * GameHeight,
 		Left:         false,
 		Right:        false,
 		Up:           false,

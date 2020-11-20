@@ -28,7 +28,7 @@ func main() {
 	//server
 	r := mux.NewRouter()
 	srv := &http.Server{
-		Addr:         ":8888",
+		Addr:         "192.168.1.38:8888",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
@@ -70,7 +70,7 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		Conn: c,
 	}
 	connections[g] = &cc
-	fmt.Printf("incoming connection %s from %s", g.String(), cc.Conn.LocalAddr().String())
+	fmt.Printf("incoming connection %s from %s\n", g.String(), cc.Conn.LocalAddr().String())
 	defer func(conn *websocket.Conn, g guuid.UUID, game *game.Game) {
 		delete(connections, g)
 		game.DeletePlayer(g)
@@ -138,6 +138,7 @@ func Execute() {
 		mainGame.Collision()
 
 		for _, c := range connections {
+
 			mainGame.SetYou(c.ID)
 			msg, err := json.Marshal(mainGame)
 			if err != nil {
