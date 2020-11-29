@@ -100,7 +100,9 @@ func New() *Game {
 }
 
 func (p *Player) MovePlayer(dt float64) {
-
+	if p.ReloadTime > 0 {
+		p.ReloadTime--
+	}
 	if p.Right && p.X < GameWidth {
 		p.X += p.Acceleration * p.Velocity
 		if !p.Up && !p.Down {

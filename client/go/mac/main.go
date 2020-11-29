@@ -149,7 +149,7 @@ func main() {
 	//interrupt := make(chan os.Signal, 1)
 	//signal.Notify(interrupt, os.Interrupt)
 
-	u := url.URL{Scheme: "ws", Host: "192.168.1.38:8888", Path: "/connect"}
+	u := url.URL{Scheme: "ws", Host: "94.130.180.22:8888", Path: "/connect"}
 	log.Printf("connecting to %s", u.String())
 
 	conn := &CustomConn{}
