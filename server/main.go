@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/maxxxlounge/websocket/game"
@@ -87,10 +88,10 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 		if mType != websocket.TextMessage {
 			continue
 		}
-		if p.ReloadTime > 0 {
-			p.ReloadTime--
+		msg := string(m)
+		if strings.Contains(msg, "setup|") {
+			p.Name = strings.Replace(msg, "setup|", "", -1)
 		}
-
 		switch string(m) {
 		case "Leftup":
 			p.Left = false
