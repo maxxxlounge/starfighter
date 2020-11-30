@@ -100,6 +100,9 @@ func New() *Game {
 }
 
 func (p *Player) MovePlayer(dt float64) {
+	if p.Life <= 0 {
+		return
+	}
 	if p.ReloadTime > 0 {
 		p.ReloadTime--
 	}
@@ -267,8 +270,4 @@ func (g *Game) MoveBullets(dt float64) {
 		}
 	}
 	return
-}
-
-func ToJson() {
-
 }
