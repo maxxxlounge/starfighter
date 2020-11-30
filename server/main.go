@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -24,6 +25,10 @@ var mainGame *game.Game
 var connections map[guuid.UUID]*CustomConn
 
 func main() {
+	enablelog := false
+	if len(os.Args) > 1 && os.Args[1] == "log" {
+		enablelog = true
+	}
 	l := &log.Logger{}
 	connections = make(map[guuid.UUID]*CustomConn)
 	//server
@@ -43,7 +48,7 @@ func main() {
 	mainGame = game.New()
 
 	go func() {
-		Execute()
+		Execute(enablelog)
 	}()
 
 	fmt.Printf("start listening on %s\n", srv.Addr)
@@ -89,6 +94,7 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 			continue
 		}
 		msg := string(m)
+		//fmt.Println(cc.ID.String() + " send message " + msg)
 		if strings.Contains(msg, "setup|") {
 			p.Name = strings.Replace(msg, "setup|", "", -1)
 		}
@@ -128,7 +134,7 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 	}
 }
 
-func Execute() {
+func Execute(enablelog bool) {
 	fmt.Println("executing")
 	last := time.Now()
 	for {
@@ -150,7 +156,9 @@ func Execute() {
 			if err != nil {
 				fmt.Println(err.Error())
 			}
-			//fmt.Printf("%v", string(msg))
+			if enablelog {
+				fmt.Printf("%v\n", string(msg))
+			}
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
