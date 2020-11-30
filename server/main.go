@@ -145,7 +145,6 @@ func Execute(enablelog bool) {
 		mainGame.Collision()
 
 		for _, c := range connections {
-
 			mainGame.SetYou(c.ID)
 			msg, err := json.Marshal(mainGame)
 			if err != nil {
