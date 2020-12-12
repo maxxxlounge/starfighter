@@ -11,26 +11,28 @@ import (
 )
 
 type Player struct {
-	ID                    string
-	UUID                  guuid.UUID
-	Name                  string
-	X                     float64
-	Y                     float64
-	Left, Right, Up, Down bool
-	Acceleration          float64
-	Velocity              float64
-	Rotation              RotationDegree
-	Life                  float64
-	Power                 float64
-	ReloadTime            float64
-	Status                PlayerStatus
-	Score                 int
-	You                   bool
+	ID                          string
+	UUID                        guuid.UUID
+	Name                        string
+	X                           float64
+	Y                           float64
+	Left, Right, Up, Down, Fire bool
+	Acceleration                float64
+	Velocity                    float64
+	Rotation                    RotationDegree
+	Life                        float64
+	Power                       float64
+	ReloadTime                  float64
+	Status                      PlayerStatus
+	Score                       int
+	You                         bool
 }
 
 type PlayerStatus string
 
 const WaitForPlay PlayerStatus = "WaitForPlay"
+const Pause PlayerStatus = "Pause"
+const Resume PlayerStatus = "Resume"
 const Ready PlayerStatus = "Ready"
 const Died PlayerStatus = "Died"
 const Idle PlayerStatus = "Idle"
@@ -63,6 +65,7 @@ type Bounds struct {
 }
 
 type Bullet struct {
+	ID guuid.UUID
 	X         float64
 	Y         float64
 	active    bool
@@ -106,6 +109,7 @@ func (p *Player) MovePlayer(dt float64) {
 	if p.ReloadTime > 0 {
 		p.ReloadTime--
 	}
+
 	if p.Right && p.X < GameWidth {
 		p.X += p.Acceleration * p.Velocity
 		if !p.Up && !p.Down {
@@ -144,6 +148,7 @@ func (p *Player) MovePlayer(dt float64) {
 			p.Rotation = RotationDown
 		}
 	}
+
 }
 
 func (g *Game) MovePlayers(dt float64) {
@@ -151,6 +156,10 @@ func (g *Game) MovePlayers(dt float64) {
 		m := sync.Mutex{}
 		m.Lock()
 		v.MovePlayer(dt)
+		if v.Fire && v.ReloadTime <= 0 {
+			g.AddBullet(v.X, v.Y, v.UUID, v.Rotation, v.Power)
+			v.ReloadTime = 25
+		}
 		m.Unlock()
 	}
 }
@@ -185,12 +194,14 @@ func (g *Game) Collision() {
 }
 
 func (g *Game) SetYou(id guuid.UUID) {
-	//g.playerMap[id].You = true
 	g.You = g.playerMap[id]
 }
 
 func (g *Game) DeletePlayer(id guuid.UUID) {
 	for i, p := range g.Players {
+		if p == nil {
+			continue
+		}
 		if p.UUID != id {
 			continue
 		}
@@ -199,6 +210,10 @@ func (g *Game) DeletePlayer(id guuid.UUID) {
 		g.Players = g.Players[:len(g.Players)-1]
 	}
 	delete(g.playerMap, id)
+}
+
+func (g *Game) GetPlayer(connID guuid.UUID) *Player {
+	return g.playerMap[connID]
 }
 
 func (g *Game) NewPlayer(id guuid.UUID) *Player {
@@ -225,7 +240,9 @@ func (g *Game) NewPlayer(id guuid.UUID) *Player {
 }
 
 func (g *Game) AddBullet(x, y float64, owner guuid.UUID, rotation RotationDegree, damage float64) {
+	bulletID := guuid.New()
 	g.Bullets = append(g.Bullets, &Bullet{
+		ID: bulletID,
 		X:         x,
 		Y:         y,
 		Owner:     owner,
@@ -236,7 +253,7 @@ func (g *Game) AddBullet(x, y float64, owner guuid.UUID, rotation RotationDegree
 	})
 }
 
-func (g *Game) MoveBullets(dt float64) {
+func (g *Game) MoveBullets() {
 	for _, b := range g.Bullets {
 		switch b.Rotation {
 		case RotationUp:

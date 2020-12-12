@@ -99,35 +99,73 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 			p.Name = strings.Replace(msg, "setup|", "", -1)
 		}
 		switch string(m) {
-		case "Leftup":
+		case "pause":
+			p.Status = game.Pause
+			break
+		case "resume":
+			p.Status = game.Resume
+			break
+		case "Leftrelease":
 			p.Left = false
 			break
-		case "Leftdown":
+		case "Leftpressed":
 			p.Left = true
 			break
-		case "Rightup":
-			p.Right = false
-			break
-		case "Rightdown":
-			p.Right = true
-			break
-		case "Downup":
-			p.Down = false
-			break
-		case "Downdown":
-			p.Down = true
-			break
-		case "Upup":
+		case "LeftUprelease":
+			p.Left = false
 			p.Up = false
 			break
-		case "Updown":
+		case "LeftUppressed":
+			p.Left = true
 			p.Up = true
 			break
-		case "shoot":
-			if p.ReloadTime <= 0 {
-				mainGame.AddBullet(p.X, p.Y, g, p.Rotation, p.Power)
-				p.ReloadTime = 25
-			}
+		case "LeftDownrelease":
+			p.Left = false
+			p.Down = false
+			break
+		case "LeftDownpressed":
+			p.Left = true
+			p.Down = true
+			break
+		case "Rightrelease":
+			p.Right = false
+			break
+		case "Rightpressed":
+			p.Right = true
+			break
+		case "RightUprelease":
+			p.Right = false
+			p.Up = false
+			break
+		case "RightUppressed":
+			p.Right = true
+			p.Up = true
+			break
+		case "RightDownrelease":
+			p.Right = false
+			p.Down = false
+			break
+		case "RightDownpressed":
+			p.Right = true
+			p.Down = true
+			break
+		case "Downrelease":
+			p.Down = false
+			break
+		case "Downpressed":
+			p.Down = true
+			break
+		case "Uprelease":
+			p.Up = false
+			break
+		case "Uppressed":
+			p.Up = true
+			break
+		case "Firepressed":
+			p.Fire = true
+			break
+		case "Firerelease":
+			p.Fire = false
 			break
 		}
 
@@ -141,10 +179,17 @@ func Execute(enablelog bool) {
 		dt := time.Since(last).Seconds()
 		last = time.Now()
 		mainGame.MovePlayers(dt)
-		mainGame.MoveBullets(dt)
+		mainGame.MoveBullets()
 		mainGame.Collision()
 
 		for _, c := range connections {
+			p := mainGame.GetPlayer(c.ID)
+			if p == nil {
+				return
+			}
+			if p.Status == game.Pause {
+				continue
+			}
 			mainGame.SetYou(c.ID)
 			msg, err := json.Marshal(mainGame)
 			if err != nil {
