@@ -181,7 +181,6 @@ func Execute(enablelog bool) {
 		mainGame.MovePlayers(dt)
 		mainGame.MoveBullets()
 		mainGame.Collision()
-
 		for _, c := range connections {
 			p := mainGame.GetPlayer(c.ID)
 			if p == nil {
@@ -204,6 +203,11 @@ func Execute(enablelog bool) {
 				fmt.Printf("%v\n", string(msg))
 			}
 		}
-		time.Sleep(20 * time.Millisecond)
+		for i := len(mainGame.Bullets) - 1; i >= 0; i-- {
+			if mainGame.Bullets[i].Exhausted {
+				mainGame.Bullets = append(mainGame.Bullets[:i], mainGame.Bullets[i+1:]...)
+			}
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 }

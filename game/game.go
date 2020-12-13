@@ -65,7 +65,7 @@ type Bounds struct {
 }
 
 type Bullet struct {
-	ID guuid.UUID
+	ID        guuid.UUID
 	X         float64
 	Y         float64
 	active    bool
@@ -187,9 +187,7 @@ func (g *Game) Collision() {
 	}
 
 	for i := len(g.Bullets) - 1; i >= 0; i-- {
-		if g.Bullets[i].Exhausted || g.Bullets[i].Y > GameHeight || g.Bullets[i].X > GameWidth || g.Bullets[i].X < 0 || g.Bullets[i].Y < 0 {
-			g.Bullets = append(g.Bullets[:i], g.Bullets[i+1:]...)
-		}
+		g.Bullets[i].Exhausted = true
 	}
 }
 
@@ -242,7 +240,7 @@ func (g *Game) NewPlayer(id guuid.UUID) *Player {
 func (g *Game) AddBullet(x, y float64, owner guuid.UUID, rotation RotationDegree, damage float64) {
 	bulletID := guuid.New()
 	g.Bullets = append(g.Bullets, &Bullet{
-		ID: bulletID,
+		ID:        bulletID,
 		X:         x,
 		Y:         y,
 		Owner:     owner,
