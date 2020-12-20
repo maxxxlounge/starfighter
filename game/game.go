@@ -185,9 +185,14 @@ func (g *Game) Collision() {
 			g.playerMap[b.Owner].Score++
 		}
 	}
-
 	for i := len(g.Bullets) - 1; i >= 0; i-- {
-		g.Bullets[i].Exhausted = true
+		if g.Bullets[i].Exhausted {
+			g.Bullets = append(g.Bullets[:i], g.Bullets[i+1:]...)
+			continue
+		}
+		if g.Bullets[i].Y > GameHeight || g.Bullets[i].X > GameWidth || g.Bullets[i].X < 0 || g.Bullets[i].Y < 0 {
+			g.Bullets[i].Exhausted = true
+		}
 	}
 }
 

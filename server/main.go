@@ -203,11 +203,7 @@ func Execute(enablelog bool) {
 				fmt.Printf("%v\n", string(msg))
 			}
 		}
-		for i := len(mainGame.Bullets) - 1; i >= 0; i-- {
-			if mainGame.Bullets[i].Exhausted {
-				mainGame.Bullets = append(mainGame.Bullets[:i], mainGame.Bullets[i+1:]...)
-			}
-		}
-		time.Sleep(10 * time.Millisecond)
+
+		time.Sleep(1	0 * time.Millisecond)
 	}
 }
