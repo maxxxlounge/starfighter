@@ -155,12 +155,12 @@ func (g *Game) MovePlayers(dt float64) {
 	for _, v := range g.Players {
 		m := sync.Mutex{}
 		m.Lock()
+		defer m.Unlock()
 		v.MovePlayer(dt)
 		if v.Fire && v.ReloadTime <= 0 {
 			g.AddBullet(v.X, v.Y, v.UUID, v.Rotation, v.Power)
 			v.ReloadTime = 25
 		}
-		m.Unlock()
 	}
 }
 
@@ -202,10 +202,7 @@ func (g *Game) SetYou(id guuid.UUID) {
 
 func (g *Game) DeletePlayer(id guuid.UUID) {
 	for i, p := range g.Players {
-		if p == nil {
-			continue
-		}
-		if p.UUID != id {
+		if p == nil || p.UUID != id {
 			continue
 		}
 		g.Players[i] = g.Players[len(g.Players)-1]

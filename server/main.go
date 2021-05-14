@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/maxxxlounge/websocket/game"
@@ -94,7 +95,7 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 			continue
 		}
 		msg := string(m)
-		//fmt.Println(cc.ID.String() + " send message " + msg)
+		fmt.Println(cc.ID.String() + " receiving message: " + msg)
 		if strings.Contains(msg, "setup|") {
 			p.Name = strings.Replace(msg, "setup|", "", -1)
 		}
@@ -174,36 +175,58 @@ func Connect(w http.ResponseWriter, r *http.Request, l *log.Logger) {
 
 func Execute(enablelog bool) {
 	fmt.Println("executing")
-	last := time.Now()
+	lastSendMessage := time.Now()
+
+	go func() {
+		for {
+			dt := time.Since(lastSendMessage).Seconds()
+			if dt < 0.02 {
+				continue
+			}
+
+			lastSendMessage = time.Now()
+			wg := &sync.WaitGroup{}
+			for _, c := range connections {
+				go func(wg *sync.WaitGroup) {
+					wg.Add(1)
+					defer wg.Done()
+					p := mainGame.GetPlayer(c.ID)
+					if p == nil {
+						return
+					}
+					if p.Status == game.Pause {
+						return
+					}
+					mainGame.SetYou(c.ID)
+					msg, err := json.Marshal(mainGame)
+					if err != nil {
+						fmt.Println(err.Error())
+					}
+					//msg := "send message to conn " + u.String()
+					err = c.Conn.WriteMessage(websocket.TextMessage, msg) //[]byte(msg))
+					if err != nil {
+						fmt.Println(err.Error())
+					}
+					if enablelog {
+						fmt.Printf("%v\n", string(msg))
+					}
+				}(wg)
+			}
+			wg.Wait()
+		}
+	}()
+
+	lastUpdateGame := time.Now()
 	for {
-		dt := time.Since(last).Seconds()
-		last = time.Now()
+		dt := time.Since(lastUpdateGame).Seconds()
+		if dt < 0.01 {
+			continue
+		}
+		lastUpdateGame = time.Now()
 		mainGame.MovePlayers(dt)
 		mainGame.MoveBullets()
 		mainGame.Collision()
-		for _, c := range connections {
-			p := mainGame.GetPlayer(c.ID)
-			if p == nil {
-				return
-			}
-			if p.Status == game.Pause {
-				continue
-			}
-			mainGame.SetYou(c.ID)
-			msg, err := json.Marshal(mainGame)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			//msg := "send message to conn " + u.String()
-			err = c.Conn.WriteMessage(websocket.TextMessage, msg) //[]byte(msg))
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			if enablelog {
-				fmt.Printf("%v\n", string(msg))
-			}
-		}
-
-		time.Sleep(1	0 * time.Millisecond)
 	}
+
+	//time.Sleep(10 * time.Millisecond)
 }
