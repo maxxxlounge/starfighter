@@ -204,6 +204,6 @@ func Execute(enablelog bool) {
 			}
 		}
 
-		time.Sleep(1	0 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 }
